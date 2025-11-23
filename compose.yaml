@@ -12,6 +12,8 @@ services: #docker compose expects
       - .env.sample
     volumes: 
       - ./backend/src:/app
+    depends_on:
+      - db_service
     develop:
       watch:
         - action: rebuild
@@ -20,14 +22,31 @@ services: #docker compose expects
           path: backend/Dockerfile
         - action: restart
           path: backend/src/
-  static_html: #custom key name
-    # image: python:3.9.23-slim-bullseye
-    build:
-      context: ./static_html
-      dockerfile: static.Dockerfile
-    ports:
-      - 8000:8000
-    command: python -m http.server 8000 # this prevents it from running and closing immediately
-    volumes: 
-      - ./static_html/src:/app
 
+  #DATABASE_URI=postgresql+psycopg://dbuser:db-password@db_service:5432/mydb
+  db_service:
+    image: postgres:17.5
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=dbuser
+      - POSTGRES_PASSWORD=db-password
+      - POSTGRES_DB=mydb
+    # env_file:
+    #   - .env.sample-db
+    volumes:
+      - dc_managed_db_volume:/var/lib/postgresql/data
+  # static_html: #custom key name
+  #   # image: python:3.9.23-slim-bullseye
+  #   build:
+  #     context: ./static_html
+  #     dockerfile: static.Dockerfile
+  #   ports:
+  #     - 8000:8000
+  #   command: python -m http.server 8000 # this prevents it from running and closing immediately
+  #   volumes: 
+  #     - ./static_html/src:/app
+
+
+volumes:
+  dc_managed_db_volume:
