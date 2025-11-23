@@ -15,6 +15,12 @@ ENV PATH=/opt/venv/bin:$PATH
 
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
+
+# Copy application code
 COPY ./src /app
-# Start the Python file server
-CMD ["python", "-m", "http.server", "8000"]
+# Copy wait-for-it script
+COPY wait-for-it.sh /wait-for-it.sh
+RUN chmod +x /wait-for-it.sh
+
+# Start FastAPI app with wait-for-it
+CMD ["/wait-for-it.sh", "db_service:5432", "--", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

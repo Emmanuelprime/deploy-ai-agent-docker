@@ -8,6 +8,7 @@ services: #docker compose expects
     command: uvicorn main:app --host 0.0.0.0 --port 8000
     environment:
       - PORT=8000
+      - DATABASE_URI=postgresql+psycopg://dbuser:db-password@db_service:5432/mydb
     env_file:
       - .env.sample
     volumes: 
@@ -32,6 +33,7 @@ services: #docker compose expects
       - POSTGRES_USER=dbuser
       - POSTGRES_PASSWORD=db-password
       - POSTGRES_DB=mydb
+      - DATABASE_URI=postgresql+psycopg://dbuser:db-password@db_service:5432/mydb
     # env_file:
     #   - .env.sample-db
     volumes:
